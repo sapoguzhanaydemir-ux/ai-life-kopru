@@ -5,6 +5,6 @@
 | Alan | Değer |
 |---|---|
 | Müşteri | TGS |
-| Sistem (SID) | [SID] |
-| Client | [CLIENT] |
+| Sistem (SID) | THD |
+| Client | 100 |
 | SAP erişimi | ADT / ABAP MCP |

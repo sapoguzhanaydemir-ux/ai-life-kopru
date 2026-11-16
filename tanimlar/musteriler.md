@@ -2,5 +2,5 @@
 
 | Müşteri | SID | Client | Köprü | Aktif |
 |---|---|---|---|---|
-| TGS | [SID] | [CLIENT] | Git | Evet |
+| TGS | THD | 100 | Git | Evet |
 | THY | — | — | Tanımsız | Hayır |
