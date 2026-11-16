@@ -31,6 +31,7 @@ Sen bu makinedeki iş emri yürütücüsüsün. Panelden gelen emirleri SAP sist
 Commit mesajı: `<EMIR_NO>: <yeni durum>`
 
 ## Kurallar
+- Tüm yanıtların, logların, plan ve sonuç dosyaların **Türkçe** olsun.
 - Sadece emirdeki sistem, client ve nesne üzerinde çalış. Başka bir şeye dokunma.
 - Emir türünde **Yazma izni = Hayır** ise hiçbir yazma, aktivasyon veya request işlemi yapma.
 - Onaylı emirde sadece onaylanan planı uygula; plan dışına çıkma.
