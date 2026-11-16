@@ -1,0 +1,25 @@
+name: Emirleri işle (TGS)
+
+on:
+  push:
+    branches: [main]
+    paths: ['emirler/**']
+  workflow_dispatch:
+
+concurrency:
+  group: tgs-yurutucu
+  cancel-in-progress: false
+
+jobs:
+  isle:
+    # Ajanın kendi commit'leri tekrar tetiklemesin
+    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.author.name != 'TGS Yurutucu'
+    runs-on: [self-hosted, tgs]
+    timeout-minutes: 30
+    steps:
+      - name: Emirleri işle
+        shell: powershell
+        working-directory: C:\Users\o.aydemir.admin\TGS_Onay\ai-life-kopru
+        run: |
+          git pull
+          claude -p "emirleri işle" --allowedTools "mcp__adt" "Bash(git:*)" "Read" "Edit" "Write"
