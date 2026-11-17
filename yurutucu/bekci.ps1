@@ -9,6 +9,10 @@ param([Parameter(Mandatory = $true)][string]$Makine)
 
 $ErrorActionPreference = 'Continue'
 $env:GIT_TERMINAL_PROMPT = '0'
+# Claude/git çıktısı UTF-8: Türkçe karakterler bozulmasın
+try { chcp 65001 | Out-Null } catch {}
+[Console]::OutputEncoding = New-Object Text.UTF8Encoding $false
+$OutputEncoding = New-Object Text.UTF8Encoding $false
 $Repo     = Split-Path $PSScriptRoot -Parent
 $LogDir   = Join-Path $env:LOCALAPPDATA 'ai-life'
 New-Item -ItemType Directory -Force $LogDir | Out-Null
@@ -154,7 +158,7 @@ while ($true) {
       $sonuc = & claude -p "emirleri işle (makine: $Makine)" --allowedTools "mcp__adt" "Bash(git:*)" "Read" "Edit" "Write" 2>&1 | Out-String
       $kod = $LASTEXITCODE
       Pop-Location
-      $ozet = ($sonuc.Trim() -replace '\s+', ' ')
+      $ozet = ($sonuc.Trim() -replace '\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?', ' ' -replace '\s*\|\s*', ' · ' -replace '\s+', ' ')
       if ($ozet.Length -gt 400) { $ozet = $ozet.Substring(0, 400) + '…' }
       $script:sonIs = [ordered]@{ zaman = (Get-Date).ToString('o'); emir = $n; ozet = $ozet }
       if ($kod -ne 0) { $script:sonHata = "Ajan çıkış kodu $kod"; Log "$($script:sonHata): $ozet" }
