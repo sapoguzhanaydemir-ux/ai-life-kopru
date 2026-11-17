@@ -8,6 +8,7 @@
 param([Parameter(Mandatory = $true)][string]$Makine)
 
 $ErrorActionPreference = 'Continue'
+$env:GIT_TERMINAL_PROMPT = '0'
 $Repo     = Split-Path $PSScriptRoot -Parent
 $LogDir   = Join-Path $env:LOCALAPPDATA 'ai-life'
 New-Item -ItemType Directory -Force $LogDir | Out-Null
@@ -106,7 +107,8 @@ function Sinyal($ayar, [bool]$calisiyor = $false) {
     git -C $HbDir rev-parse -q --verify HEAD 2>&1 | Out-Null
     if ($LASTEXITCODE -eq 0) { git -C $HbDir commit -q --amend -m sinyal 2>&1 | Out-Null }
     else { git -C $HbDir commit -q -m sinyal 2>&1 | Out-Null }
-    git -C $HbDir push -q -f origin "durum-$Label" 2>&1 | Out-Null
+    $po = git -C $HbDir -c credential.interactive=never push -f origin "HEAD:refs/heads/durum-$Label" 2>&1 | Out-String
+    if ($LASTEXITCODE -ne 0) { Log "Sinyal push hatası: $($po.Trim())" }
   } catch { Log "Sinyal gönderilemedi: $_" }
 }
 
