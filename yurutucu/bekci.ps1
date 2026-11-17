@@ -70,6 +70,29 @@ function AdtAcik {
   } catch { return $false }
 }
 
+# Pencere gizleme (Win32): yürütücünün açtığı VS Code penceresi ekranda görünmesin
+Add-Type -ErrorAction SilentlyContinue @"
+using System; using System.Text; using System.Runtime.InteropServices; using System.Collections.Generic;
+public static class AiLifeWin {
+  delegate bool EnumProc(IntPtr h, IntPtr p);
+  [DllImport("user32.dll")] static extern bool EnumWindows(EnumProc cb, IntPtr p);
+  [DllImport("user32.dll", CharSet=CharSet.Unicode)] static extern int GetWindowText(IntPtr h, StringBuilder s, int n);
+  [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr h);
+  [DllImport("user32.dll")] static extern bool ShowWindow(IntPtr h, int c);
+  public static int Hide(string titlePart) {
+    int n = 0;
+    EnumWindows((h, p) => {
+      if (!IsWindowVisible(h)) return true;
+      var sb = new StringBuilder(512); GetWindowText(h, sb, 512);
+      var t = sb.ToString();
+      if (t.Contains(titlePart) && t.Contains("Visual Studio Code")) { ShowWindow(h, 0); n++; }
+      return true;
+    }, IntPtr.Zero);
+    return n;
+  }
+}
+"@
+
 # SAP erişimi VS Code ADT eklentisinden gelir: VS Code kapalıysa simge durumunda başlat (son oturumu geri yükler)
 function VsCodeAyakta {
   if (AdtAcik) { return }
@@ -88,7 +111,11 @@ function VsCodeAyakta {
   }
   if ($ws -and (Test-Path $ws)) { Start-Process $exe -ArgumentList "`"$ws`"" -WindowStyle Minimized }
   else { Start-Process $exe -WindowStyle Minimized }
-  Log "VS Code arka planda başlatıldı (ADT için) $ws"
+  # Pencereyi tamamen gizle (görev çubuğunda da görünmez); eklenti arka planda çalışmaya devam eder
+  $baslik = if ($ws) { [IO.Path]::GetFileNameWithoutExtension($ws) } else { 'Visual Studio Code' }
+  $gizlendi = 0
+  for ($i = 0; $i -lt 30 -and $gizlendi -eq 0; $i++) { Start-Sleep -Seconds 2; $gizlendi = [AiLifeWin]::Hide($baslik) }
+  Log "VS Code arka planda başlatıldı (ADT için) $ws · gizlenen pencere: $gizlendi"
 }
 
 function Sinyal($ayar, [bool]$calisiyor = $false) {
