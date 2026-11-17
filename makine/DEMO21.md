@@ -9,3 +9,4 @@
 | Client | 100 |
 | SAP erişimi | ADT / ABAP MCP (adt) |
 | ADT destination | S4H_100_XOAYDEMIR_TR |
+| VS Code çalışma alanı | C:\ai-abap-demo\S4H_100_XOAYDEMIR_TR.code-workspace |

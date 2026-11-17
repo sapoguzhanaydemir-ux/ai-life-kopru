@@ -77,8 +77,14 @@ function VsCodeAyakta {
   }
   $exe = @("$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe", "$env:ProgramFiles\Microsoft VS Code\Code.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
   if (-not $exe) { $script:sonHata = 'VS Code bulunamadı'; return }
-  Start-Process $exe -WindowStyle Minimized
-  Log 'VS Code arka planda başlatıldı (ADT için)'
+  # makine/<MAKİNE>.md içindeki 'VS Code çalışma alanı' varsa onu aç (ADT bağlantısı o çalışma alanında)
+  $ws = $null
+  foreach ($l in Get-Content (Join-Path $Repo "makine\$Makine.md") -Encoding UTF8) {
+    if ($l -match '^\s*\|\s*VS Code çalışma alanı\s*\|\s*([^|]+?)\s*\|') { $ws = $matches[1] }
+  }
+  if ($ws -and (Test-Path $ws)) { Start-Process $exe -ArgumentList "`"$ws`"" -WindowStyle Minimized }
+  else { Start-Process $exe -WindowStyle Minimized }
+  Log "VS Code arka planda başlatıldı (ADT için) $ws"
 }
 
 function Sinyal($ayar, [bool]$calisiyor = $false) {
