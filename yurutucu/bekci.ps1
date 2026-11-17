@@ -19,6 +19,7 @@ $AdtPort  = 2236
 $script:sonHata = ''
 $script:sonIs   = $null
 $lastHb   = [datetime]::MinValue
+$lastCode = [datetime]::MinValue
 
 function Log([string]$m) {
   Add-Content $Log ("{0:yyyy-MM-dd HH:mm:ss} {1}" -f (Get-Date), $m) -Encoding UTF8
@@ -62,6 +63,21 @@ function AdtAcik {
     $ok = $c.ConnectAsync('127.0.0.1', $AdtPort).Wait(1500) -and $c.Connected
     $c.Close(); return $ok
   } catch { return $false }
+}
+
+# SAP erişimi VS Code ADT eklentisinden gelir: VS Code kapalıysa simge durumunda başlat (son oturumu geri yükler)
+function VsCodeAyakta {
+  if (AdtAcik) { return }
+  if (((Get-Date) - $script:lastCode).TotalMinutes -lt 5) { return }
+  $script:lastCode = Get-Date
+  if (Get-Process Code -ErrorAction SilentlyContinue) {
+    $script:sonHata = "VS Code açık ama SAP bağlantısı (ADT, port $AdtPort) kapalı. Sisteme giriş yapılmış mı?"
+    return
+  }
+  $exe = @("$env:LOCALAPPDATA\Programs\Microsoft VS Code\Code.exe", "$env:ProgramFiles\Microsoft VS Code\Code.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1
+  if (-not $exe) { $script:sonHata = 'VS Code bulunamadı'; return }
+  Start-Process $exe -WindowStyle Minimized
+  Log 'VS Code arka planda başlatıldı (ADT için)'
 }
 
 function Sinyal($ayar, [bool]$calisiyor = $false) {
@@ -114,6 +130,7 @@ while ($true) {
     if ($ayar -and $ayar['Aralık (sn)'] -match '^\d+$') { $script:aralik = [math]::Max(15, [int]$ayar['Aralık (sn)']) }
     $acik = $ayar -and $ayar['Yürütücü'] -ne 'Kapalı' -and $ayar['Aktif'] -ne 'Hayır'
 
+    if ($acik) { VsCodeAyakta }
     if ($script:sonHata -like '*ADT, port*' -and (AdtAcik)) { $script:sonHata = '' }
     $n = 0
     if ($acik) { $n = Bekleyen }
