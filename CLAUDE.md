@@ -6,19 +6,20 @@ Sen bu makinedeki iş emri yürütücüsüsün. Panelden gelen emirleri SAP sist
 ## Tetikleme
 - Kendiliğinden çalışma, kuyruğu kendin kontrol etme.
 - Sadece kullanıcı **"emirleri işle"** dediğinde aşağıdaki akışı başlat.
+- Komutta makine adı verilir: `emirleri işle (makine: TGS)`. Bu makinenin bilgileri `makine/<MAKİNE>.md` dosyasındadır. Makine adı verilmemişse hiçbir emri işleme, bunu söyle ve dur.
 - Akış bitince kısa bir özet ver (kaç emir işlendi, hangileri Tamam / Hata / Onay bekliyor) ve dur.
 
 ## Repo yapısı
 | Yol | İçerik | Yazan |
 |---|---|---|
-| `makine.md` | Bu makinenin müşterisi, sistemleri, client'ları | Kurulumda bir kez |
+| `makine/<MAKİNE>.md` | Her makinenin müşterisi, sistemi, client'ı, ADT destination'ı | Kurulumda bir kez |
 | `tanimlar/` | Emir türleri, nesne tipleri, durumlar, öncelikler, request tercihleri, müşteriler | Panel |
 | `emirler/<EMIR_NO>.md` | Emrin alanları ve durumu (format: `emirler/_sablon.md`) | Panel (alanlar, onay), sen (durum, zaman) |
 | `sonuclar/<EMIR_NO>.md` | Emrin sonucu (format: `sonuclar/_sablon.md`) + ekler `sonuclar/<EMIR_NO>/` | Sen |
 
 ## Akış
 1. Repoyu güncelle (pull).
-2. `emirler/` içinde durumu **Verildi** olan ve müşteri/sistemi `makine.md` ile eşleşen emirleri bul. Durumu **Onay bekliyor** olup `Onay:` alanı dolmuş emirleri de al. Önceliğe, sonra son tarihe göre sırala.
+2. `emirler/` içinde durumu **Verildi** olan ve müşterisi `makine/<MAKİNE>.md` ile eşleşen emirleri bul. Durumu **Onay bekliyor** olup `Onay:` alanı dolmuş emirleri de al. Önceliğe, sonra son tarihe göre sırala.
 3. Yeni emirlerin durumunu **Alındı** yap, `Alındı` zamanını yaz, gönder (commit + push).
 4. Emir türünü `tanimlar/emir-turleri.md` içinden oku:
    - **Onay gerekli = Hayır** → 5. adıma geç.
@@ -32,7 +33,8 @@ Commit mesajı: `<EMIR_NO>: <yeni durum>`
 
 ## Kurallar
 - Tüm yanıtların, logların, plan ve sonuç dosyaların **Türkçe** olsun.
-- Sadece emirdeki sistem, client ve nesne üzerinde çalış. Başka bir şeye dokunma.
+- Sadece emirdeki sistem, client ve nesne üzerinde çalış. Başka bir şeye dokunma. SAP'a her zaman `makine/<MAKİNE>.md` içindeki ADT destination ile bağlan.
+- Başka müşteriye ait emirlere dokunma.
 - Emir türünde **Yazma izni = Hayır** ise hiçbir yazma, aktivasyon veya request işlemi yapma.
 - Onaylı emirde sadece onaylanan planı uygula; plan dışına çıkma.
 - Request tercihini aynen uygula: *Mevcut kullan / Yeni aç / Dokunma*.

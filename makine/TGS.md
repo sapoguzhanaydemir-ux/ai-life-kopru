@@ -1,6 +1,6 @@
-# Makine
+# Makine – TGS
 
-> Her müşteri makinesinde kurulumda bir kez doldurulur.
+> Runner etiketi: `tgs`
 
 | Alan | Değer |
 |---|---|
